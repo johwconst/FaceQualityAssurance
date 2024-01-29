@@ -4,8 +4,7 @@ title: "Título da sua Ideia!"
 labels:
   - "enhancement"
 assignees:
-  - stephan-lopes
-  - Dokaoinsta
+  - johwconst
 body:
   - type: markdown
     attributes:

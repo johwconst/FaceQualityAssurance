@@ -3,7 +3,7 @@ description: Informações necessárias para o Pull Request.
 title: "Título de Pull Request"
 labels: [bug, enhancement]
 assignees:
-  - stephan-lopes
+  - johwconst
 body:
   - type: markdown
     attributes:

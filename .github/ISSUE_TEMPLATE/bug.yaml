@@ -4,8 +4,7 @@ title: "Título do Bug!"
 labels:
   - "bug"
 assignees:
-  - stephan-lopes
-  - Dokaoinsta
+  - johwconst
 body:
   - type: markdown
     attributes:
