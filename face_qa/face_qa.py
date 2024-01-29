@@ -210,6 +210,3 @@ class FaceQA():
         self.result['brightness_is_good'] =  False
         self.result['face_is_centralized'] = False
         return self.result
-
-
-teste = FaceQA()
