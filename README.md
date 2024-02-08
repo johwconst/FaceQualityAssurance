@@ -34,6 +34,13 @@ The effectiveness of face registration in systems or devices utilizing facial re
 
 The aim of this project is to create a tool for validating the quality of these images before they are sent to the facial recognition device or system.
 
+<p class="header" align="center">
+ <img width="200px" src="https://i.imgur.com/YmtxbCM.png" align="center" alt="Image" />
+ <img width="200px" src="https://i.imgur.com/R3Uf1XU.png" align="center" alt="Image" />
+ <img width="200px" src="https://i.imgur.com/MGwJRWX.png" align="center" alt="Image" />
+</p>
+
+
 ## Verified Features
 - Verify if there is a face in the image ✔️
 - Verify if there is more than one face in the image ✔️
@@ -50,6 +57,11 @@ Check | Classificator |
 Face | HeerCascade or MediaPipe
 Smile | HeerCascade
 Eyes | HeerCascade
+
+## Interface Demo
+<p>
+<a href="https://github.com/johwconst/FaceQualityAssurance/releases/download/1.0.0/demo_interface.exe"">Download .EXE Interface Demo</a>
+</p>
 
 ## Install
 
