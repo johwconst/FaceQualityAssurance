@@ -1,6 +1,7 @@
 import mediapipe as mp
 import cv2
 import numpy as np
+import os
 
 class FaceQA():
     '''
@@ -31,7 +32,7 @@ class FaceQA():
                 return self._return_all_false_result()
         
         # Haarcascade is default to validade other params
-        model_path = 'models/haarcascade_frontalface_default.xml'
+        model_path = os.path.dirname(__file__) + '/models/haarcascade_frontalface_default.xml'
         image = cv2.imread(self.image_path)
         
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -56,7 +57,7 @@ class FaceQA():
         '''
         Using HaarCascade to Face Classification
         '''
-        model_path = 'models/haarcascade_frontalface_default.xml'
+        model_path = os.path.dirname(__file__) + '/models/haarcascade_frontalface_default.xml'
         image = cv2.imread(self.image_path)
         
         # To gray scale
@@ -84,7 +85,7 @@ class FaceQA():
         '''
         Using MediaPipe to Face Classification
         '''
-        model_path = 'models/blaze_face_short_range.tflite'
+        model_path = os.path.dirname(__file__) + '/models/blaze_face_short_range.tflite'
         
         BaseOptions = mp.tasks.BaseOptions
         FaceDetector = mp.tasks.vision.FaceDetector
@@ -158,7 +159,7 @@ class FaceQA():
         '''
         Using HaarCascade to Eyes Classification
         '''
-        model_path = 'models/haarcascade_eye.xml'
+        model_path = os.path.dirname(__file__) + '/models/haarcascade_eye.xml'
 
         eye_cascade = cv2.CascadeClassifier(model_path)
         
@@ -182,7 +183,7 @@ class FaceQA():
         '''
         Using HaarCascade to Face Classification
         '''
-        model_path = 'models/haarcascade_smile.xml'
+        model_path = os.path.dirname(__file__) + '/models/haarcascade_smile.xml'
 
         gray = cv2.cvtColor(face_image, cv2.COLOR_BGR2GRAY)
 
