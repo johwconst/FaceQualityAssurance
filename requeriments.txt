@@ -4,7 +4,7 @@ cffi==1.16.0
 contourpy==1.2.0
 cycler==0.12.1
 flatbuffers==23.5.26
-fonttools==4.47.2
+fonttools==4.48.1
 kiwisolver==1.4.5
 matplotlib==3.8.2
 mediapipe==0.10.9
