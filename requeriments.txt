@@ -8,7 +8,7 @@ fonttools==4.47.2
 kiwisolver==1.4.5
 matplotlib==3.8.2
 mediapipe==0.10.9
-numpy==1.26.3
+numpy==1.26.4
 opencv-contrib-python==4.9.0.80
 packaging==23.2
 protobuf==3.20.3
