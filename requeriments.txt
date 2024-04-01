@@ -3,7 +3,7 @@ attrs==23.2.0
 cffi==1.16.0
 contourpy==1.2.0
 cycler==0.12.1
-flatbuffers==23.5.26
+flatbuffers==24.3.25
 fonttools==4.47.2
 kiwisolver==1.4.5
 matplotlib==3.8.2
