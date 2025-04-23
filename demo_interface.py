@@ -71,7 +71,7 @@ class InterfaceDemo(customtkinter.CTk):
         # Resize image
         if image.width > 200 or image.height > 200:
             ratio = min(200/image.width, 200/image.height)
-            image = image.resize((int(image.width * ratio), int(image.height * ratio)), Image.ANTIALIAS)
+            image = image.resize((int(image.width * ratio), int(image.height * ratio)), Image.Resampling.LANCZOS)
 
         if hasattr(self, "image_label"):
             self.image_label.pack_forget()
