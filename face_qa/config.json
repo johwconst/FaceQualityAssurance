@@ -1,14 +1,14 @@
 {
-  "scale_factor_face_cascade": 1.1,
-  "min_neighbors_face_cascade": 5,
+    "scale_factor_face_cascade": 1.1,
+    "min_neighbors_face_cascade": 5,
   "min_size_face_cascade": [30, 30],
 
-  "brightness_threshold": 100,
-  "contrast_threshold": 32,
+    "brightness_threshold": 100,
+    "contrast_threshold": 32,
 
-  "face_height_percentage" : 0.5, 
-  "eye_area_threshold": 100,
-  
-  "smile_ratio_threshold": 200,
-  "face_center_threshold": 0.25
+    "face_height_adcional": 145,
+    "eye_area_threshold": 100,
+
+    "smile_ratio_threshold": 200,
+    "face_center_threshold": 0.25
 }

@@ -77,11 +77,10 @@ class InterfaceDemo(customtkinter.CTk):
         
         self.add_slider("face_center_threshold", "Desvio centro", 0, 1, 0.01)
         
+        self.add_slider("face_height_adcional", "Altura adicional", 0, 1000, 1)
         self.add_slider("eye_area_threshold", "Área olhos (0.0 - 1.0)", 0, 1, 0.01)
         
         self.add_slider("smile_ratio_threshold", "Área sorriso", 0, 100, 1)
-
-        self.select_folder()
 
     def load_config(self):
         """Carrega as configurações do arquivo JSON"""
@@ -98,14 +97,21 @@ class InterfaceDemo(customtkinter.CTk):
     def save_config(self):
         """Salva as configurações no arquivo JSON"""
         try:
-            with open('config.json', 'w') as file:
+            file_path = os.path.join(os.path.dirname(__file__), 'face_qa/config.json')
+            with open(file_path, 'w') as file:
                 json.dump(self.thresholds, file, indent=4)
         except Exception as e:
             print(f"Erro ao salvar o arquivo de configuração: {e}")
 
     def add_slider(self, key, label_text, min_val, max_val, step=1):
         def update_slider(value):
-            self.thresholds[key] = float(value)
+            
+            #  verifica se step é float
+            if isinstance(step, float):
+              self.thresholds[key] = float(value)
+            else:
+              self.thresholds[key] = int(value)
+              
             self.save_config()  # Salva o novo valor no arquivo JSON
             if self.image_paths:
                 self.load_image(self.image_paths[self.current_index])
@@ -120,8 +126,7 @@ class InterfaceDemo(customtkinter.CTk):
         slider.pack(pady=5)
 
     def select_folder(self):
-        # folder_path = filedialog.askdirectory(title='Selecionar pasta de imagens')
-        folder_path = "/home/augusto.savi/Documentos/github/FaceQualityAssurance/fotos"
+        folder_path = filedialog.askdirectory(title='Selecionar pasta de imagens')
         print(f"Selecionando pasta: {folder_path}")
         if not folder_path:
             return
@@ -132,8 +137,9 @@ class InterfaceDemo(customtkinter.CTk):
             for f in os.listdir(folder_path)
             if f.lower().endswith(valid_extensions)
         ]
-
-        self.image_paths.sort()
+        # sort images by name without extension
+        self.image_paths.sort(key=lambda x: os.path.splitext(x)[0])
+        
         self.current_index = 0
         if self.image_paths:
             self.load_image(self.image_paths[self.current_index])

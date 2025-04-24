@@ -40,6 +40,13 @@ The aim of this project is to create a tool for validating the quality of these 
  <img width="200px" src="https://i.imgur.com/MGwJRWX.png" align="center" alt="Image" />
 </p>
 
+## Demo interface folder
+
+![image](https://github.com/user-attachments/assets/94d25d35-ec96-448f-9694-e13f7170e810)
+![image](https://github.com/user-attachments/assets/08c7b366-4c5b-4e55-b88b-b810a095ed99)
+![image](https://github.com/user-attachments/assets/19f128ff-0dd6-4820-97c3-b09a5508f71b)
+![image](https://github.com/user-attachments/assets/fe3ed821-14e8-4787-9d31-286c145e05df)
+
 
 ## Verified Features
 - Verify if there is a face in the image ✔️
@@ -55,7 +62,7 @@ The aim of this project is to create a tool for validating the quality of these 
 Check | Classificator |
 -- |-- |
 Face | HeerCascade or MediaPipe
-Smile | HeerCascade
+Smile | MediaPipe 
 Eyes | HeerCascade
 
 ## Interface Demo

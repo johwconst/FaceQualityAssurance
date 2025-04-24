@@ -131,23 +131,38 @@ class FaceQA():
     def _eye_is_good(self, gray_image, face_image) -> bool:
         model_path = os.path.dirname(__file__) + '/models/haarcascade_eye.xml'
         eye_cascade = cv2.CascadeClassifier(model_path)
-        eyes = eye_cascade.detectMultiScale(face_image, minNeighbors=4)
-        annotated = face_image.copy()
 
-        # get maiores olhos
+        # Corta apenas a parte superior do rosto
+        height = face_image.shape[0] + self.config["face_height_adcional"]
+        upper_face_image = face_image[:height // 2, :]
+        upper_gray_image = gray_image[:height // 2, :]
+
+        self._save_image_result_folder_output(upper_gray_image, prefix="heigth_eyes_")
+
+        # Detecta olhos só na parte de cima
+        eyes = eye_cascade.detectMultiScale(upper_face_image, minNeighbors=4)
+        annotated = upper_face_image.copy()
+
+        # Pega os dois maiores olhos
         eyes = sorted(eyes, key=lambda x: x[2] * x[3], reverse=True)[:2]
-        
+
         good_eye = False
         for (ex, ey, ew, eh) in eyes:
-            eye_roi = gray_image[ey:ey+eh, ex:ex+ew]
+            # Corrige ey para coordenada da imagem original
+            absolute_ey = ey  # já é parte superior, então não precisa somar offset
+
+            eye_roi = upper_gray_image[absolute_ey:absolute_ey+eh, ex:ex+ew]
             thresh = cv2.threshold(eye_roi, 70, 255, cv2.THRESH_BINARY_INV)[1]
             cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
+
             for c in cnts:
                 area = cv2.contourArea(c)
                 if area > self.config["eye_area_threshold"]:
                     good_eye = True
-            cv2.rectangle(annotated, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
-        
+
+            # Corrige coordenadas para desenhar na imagem completa
+            cv2.rectangle(annotated, (ex, absolute_ey), (ex+ew, absolute_ey+eh), (0, 255, 0), 2)
+
         self._save_image_result_folder_output(annotated, prefix="eyes_")
         return good_eye
 
