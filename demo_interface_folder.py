@@ -68,10 +68,18 @@ class InterfaceDemo(customtkinter.CTk):
         self.button_previus.pack(pady=5)
 
         # Sliders
+        self.add_slider("scale_factor_face_cascade", "Fator de escala da face", 1, 10, 0.1)
+        self.add_slider("min_neighbors_face_cascade", "Mínimos vizinhos face", 1, 50)
+
         self.add_slider("brightness_threshold", "Brilho mínimo", 0, 255)
+        
         self.add_slider("contrast_threshold", "Contraste mínimo", 0, 100)
-        self.add_slider("face_center_threshold", "Desvio centro (0.0 - 1.0)", 0, 1, 0.01)
+        
+        self.add_slider("face_center_threshold", "Desvio centro", 0, 1, 0.01)
+        
         self.add_slider("eye_area_threshold", "Área olhos (0.0 - 1.0)", 0, 1, 0.01)
+        
+        self.add_slider("smile_ratio_threshold", "Área sorriso", 0, 100, 1)
 
         self.select_folder()
 
@@ -85,12 +93,7 @@ class InterfaceDemo(customtkinter.CTk):
             return config
         except Exception as e:
             print(f"Erro ao carregar o arquivo de configuração: {e}")
-            return {
-                "brightness_threshold": 100,
-                "contrast": 30,
-                "center": 0.35,
-                "eye_area": 0.25,
-            }
+            exit(1)
 
     def save_config(self):
         """Salva as configurações no arquivo JSON"""
@@ -228,7 +231,7 @@ class InterfaceDemo(customtkinter.CTk):
                         # print(f"Carregando imagem auxiliar: {file}")
                         img_path = os.path.join(output_dir, file)
                         img = Image.open(img_path)
-                        img = img.resize((150, 150), Image.ANTIALIAS)
+                        img = img.resize((150, 150), Image.Resampling.LANCZOS)
                         photo = ImageTk.PhotoImage(img)
                         label = Label(self.frame_initial, image=photo)
                         label.image = photo

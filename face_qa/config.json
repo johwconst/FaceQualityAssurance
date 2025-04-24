@@ -3,9 +3,12 @@
   "min_neighbors_face_cascade": 5,
   "min_size_face_cascade": [30, 30],
 
-  "brightness_threshold": 120,
-  "contrast_threshold": 35,
+  "brightness_threshold": 100,
+  "contrast_threshold": 32,
+
+  "face_height_percentage" : 0.5, 
   "eye_area_threshold": 100,
-  "smile_area_threshold": 6,
+  
+  "smile_ratio_threshold": 200,
   "face_center_threshold": 0.25
 }

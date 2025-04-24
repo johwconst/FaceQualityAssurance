@@ -151,34 +151,62 @@ class FaceQA():
         self._save_image_result_folder_output(annotated, prefix="eyes_")
         return good_eye
 
-    def _is_smiling(self, face_cascade, face_image) -> bool:
-        model_path = os.path.dirname(__file__) + '/models/haarcascade_smile.xml'
-        gray = cv2.cvtColor(face_image, cv2.COLOR_BGR2GRAY)
-        smile_cascade = cv2.CascadeClassifier(model_path)
-        faces = face_cascade.detectMultiScale(gray, 1.1, 5)
+    def _is_smiling(self, _, face_image) -> bool:
+        import mediapipe as mp
+        import numpy as np
+        import cv2
+
+        mp_face_mesh = mp.solutions.face_mesh
         annotated = face_image.copy()
+        smile_ratio_threshold = self.config.get("smile_ratio_threshold", 1.8)
+        min_mouth_width = self.config.get("min_mouth_width", 40)
 
-        smiling = False
-        for (x, y, w, h) in faces:
-            roi_gray = gray[y:y+h, x:x+w]
-            smiles = smile_cascade.detectMultiScale(roi_gray, 2.0, self.config["smile_area_threshold"])
-            if len(smiles) > 0:
-                smiling = True
-            for (sx, sy, sw, sh) in smiles:
-                cv2.rectangle(annotated, (x+sx, y+sy), (x+sx+sw, y+sy+sh), (0, 255, 255), 2)
+        with mp_face_mesh.FaceMesh(static_image_mode=True, max_num_faces=1, refine_landmarks=True) as face_mesh:
+            rgb_image = cv2.cvtColor(face_image, cv2.COLOR_BGR2RGB)
+            results = face_mesh.process(rgb_image)
 
-        self._save_image_result_folder_output(annotated, prefix="smile_")
-        return smiling
+            if not results.multi_face_landmarks:
+                self._save_image_result_folder_output(annotated, prefix="smile_")
+                return False
 
-    def _return_all_false_result(self):
-        self.result['face_detected'] = False
-        self.result['more_than_one_face'] = False
-        self.result['eyes_is_good'] = False
-        self.result['is_smiling'] = False
-        self.result['contrast_is_good'] = False
-        self.result['brightness_is_good'] = False
-        self.result['face_is_centralized'] = False
-        return self.result
+            landmarks = results.multi_face_landmarks[0].landmark
+            img_h, img_w, _ = face_image.shape
+
+            def to_pixel(landmark):
+                return np.array([landmark.x * img_w, landmark.y * img_h])
+
+            # Posição dos pontos da boca
+            left_pt = to_pixel(landmarks[61])
+            right_pt = to_pixel(landmarks[291])
+            top_pt = to_pixel(landmarks[13])
+            bottom_pt = to_pixel(landmarks[14])
+
+            mouth_width = np.linalg.norm(right_pt - left_pt)
+            mouth_height = np.linalg.norm(top_pt - bottom_pt)
+            smile_ratio = mouth_width / (mouth_height + 1e-6)
+
+
+
+            # Validações extras
+            if mouth_width < min_mouth_width:
+                print(f"{self.image_path}: {mouth_width} < {min_mouth_width}")
+                print("[Debug] Boca muito pequena para analisar sorriso.")
+                smiling = False
+            elif smile_ratio < 1.1:  # sorriso muito fraco
+                print(f"{self.image_path}: {smile_ratio} < 1.1")
+                smiling = False
+            else:
+                print(f"{self.image_path}: {smile_ratio:.2f} < {smile_ratio_threshold}")
+                smiling = smile_ratio < smile_ratio_threshold
+
+            # Desenho e debug
+            cv2.putText(annotated, f"Smile Ratio: {smile_ratio:.2f}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
+            cv2.line(annotated, tuple(left_pt.astype(int)), tuple(right_pt.astype(int)), (0, 255, 255), 2)
+            cv2.line(annotated, tuple(top_pt.astype(int)), tuple(bottom_pt.astype(int)), (255, 0, 255), 2)
+
+            self._save_image_result_folder_output(annotated, prefix="smile_")
+            return smiling
+
     
     def _save_image_result_folder_output(self, image, folder_path = 'output', prefix = 'result_'):
         if not os.path.exists(folder_path):
