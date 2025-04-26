@@ -24,7 +24,6 @@ class FaceQA():
     def _load_config(self, config_path: str):
         """Carrega o arquivo JSON de configuração."""
         path_file = os.path.dirname(__file__) + config_path
-        # print(f"Loading config from: {path_file}")
         with open(path_file, 'r') as config_file:
             config = json.load(config_file)
         return config
@@ -204,14 +203,10 @@ class FaceQA():
 
             # Validações extras
             if mouth_width < min_mouth_width:
-                print(f"{self.image_path}: {mouth_width} < {min_mouth_width}")
-                print("[Debug] Boca muito pequena para analisar sorriso.")
                 smiling = False
-            elif smile_ratio < 1.1:  # sorriso muito fraco
-                print(f"{self.image_path}: {smile_ratio} < 1.1")
+            elif smile_ratio < 1.1:
                 smiling = False
             else:
-                print(f"{self.image_path}: {smile_ratio:.2f} < {smile_ratio_threshold}")
                 smiling = smile_ratio < smile_ratio_threshold
 
             # Desenho e debug
@@ -229,4 +224,3 @@ class FaceQA():
         
         output_path = os.path.join(folder_path, f"{prefix}.png")
         cv2.imwrite(output_path, image)
-        # print(f"Image saved to {output_path}")

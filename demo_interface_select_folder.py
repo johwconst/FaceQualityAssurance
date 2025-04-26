@@ -5,12 +5,13 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 from face_qa.face_qa import FaceQA
 import os
+import re
 
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
 
-class InterfaceDemo(customtkinter.CTk):
+class FaceQAViewer(customtkinter.CTk):
 
     WIDTH = 800
     HEIGHT = 800
@@ -19,13 +20,13 @@ class InterfaceDemo(customtkinter.CTk):
         super().__init__()
 
         self.title("FaceQA Viewer")
-        self.geometry(f"{InterfaceDemo.WIDTH}x{InterfaceDemo.HEIGHT}")
+        self.geometry(f"{FaceQAViewer.WIDTH}x{FaceQAViewer.HEIGHT}")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
         self.image_paths = []
         self.current_index = 0
 
-        self.thresholds = self.load_config()  # Carrega as configurações do JSON
+        self.thresholds = self.load_config()
         self.face_qa = None
         self.image = None
 
@@ -48,71 +49,59 @@ class InterfaceDemo(customtkinter.CTk):
 
         self.button_select_folder = customtkinter.CTkButton(
             master=self.frame_info,
-            text="Selecionar pasta",
+            text="Select folder",
             command=self.select_folder
         )
         self.button_select_folder.pack(pady=5)
 
         self.button_next = customtkinter.CTkButton(
             master=self.frame_info,
-            text="Próxima imagem",
+            text="Next image",
             command=self.next_image
         )
         self.button_next.pack(pady=5)
 
-        self.button_previus = customtkinter.CTkButton(
+        self.button_previous = customtkinter.CTkButton(
             master=self.frame_info,
-            text="Imagem anterior",
+            text="Previous image",
             command=self.previous_image
         )
-        self.button_previus.pack(pady=5)
+        self.button_previous.pack(pady=5)
 
         # Sliders
-        self.add_slider("scale_factor_face_cascade", "Fator de escala da face", 1, 10, 0.1)
-        self.add_slider("min_neighbors_face_cascade", "Mínimos vizinhos face", 1, 50)
-
-        self.add_slider("brightness_threshold", "Brilho mínimo", 0, 255)
-        
-        self.add_slider("contrast_threshold", "Contraste mínimo", 0, 100)
-        
-        self.add_slider("face_center_threshold", "Desvio centro", 0, 1, 0.01)
-        
-        self.add_slider("face_height_adcional", "Altura adicional", 0, 1000, 1)
-        self.add_slider("eye_area_threshold", "Área olhos (0.0 - 1.0)", 0, 1, 0.01)
-        
-        self.add_slider("smile_ratio_threshold", "Área sorriso", 0, 100, 1)
+        self.add_slider("scale_factor_face_cascade", "Face scale factor", 1, 10, 0.1)
+        self.add_slider("min_neighbors_face_cascade", "Min neighbors for face", 1, 50)
+        self.add_slider("brightness_threshold", "Min brightness", 0, 255)
+        self.add_slider("contrast_threshold", "Min contrast", 0, 100)
+        self.add_slider("face_center_threshold", "Center deviation", 0, 1, 0.01)
+        self.add_slider("face_height_adcional", "Extra face height", 0, 1000, 1)
+        self.add_slider("eye_area_threshold", "Eye area", 0, 1, 0.01)
+        self.add_slider("smile_ratio_threshold", "Smile area", 0, 100, 1)
 
     def load_config(self):
-        """Carrega as configurações do arquivo JSON"""
+        """Load configuration from JSON file"""
         try:
             file_path = os.path.join(os.path.dirname(__file__), 'face_qa/config.json')
-            # print(f"Loading config from: {file_path}")
             with open(file_path, 'r') as file:
                 config = json.load(file)
             return config
         except Exception as e:
-            print(f"Erro ao carregar o arquivo de configuração: {e}")
+            print(f"Error loading config file: {e}")
             exit(1)
 
     def save_config(self):
-        """Salva as configurações no arquivo JSON"""
+        """Save configuration to JSON file"""
         try:
             file_path = os.path.join(os.path.dirname(__file__), 'face_qa/config.json')
             with open(file_path, 'w') as file:
                 json.dump(self.thresholds, file, indent=4)
         except Exception as e:
-            print(f"Erro ao salvar o arquivo de configuração: {e}")
+            print(f"Error saving config file: {e}")
 
     def add_slider(self, key, label_text, min_val, max_val, step=1):
         def update_slider(value):
-            
-            #  verifica se step é float
-            if isinstance(step, float):
-              self.thresholds[key] = float(value)
-            else:
-              self.thresholds[key] = int(value)
-              
-            self.save_config()  # Salva o novo valor no arquivo JSON
+            self.thresholds[key] = float(value) if isinstance(step, float) else int(value)
+            self.save_config()
             if self.image_paths:
                 self.load_image(self.image_paths[self.current_index])
 
@@ -126,8 +115,8 @@ class InterfaceDemo(customtkinter.CTk):
         slider.pack(pady=5)
 
     def select_folder(self):
-        folder_path = filedialog.askdirectory(title='Selecionar pasta de imagens')
-        print(f"Selecionando pasta: {folder_path}")
+        folder_path = filedialog.askdirectory(title='Select image folder')
+        print(f"Selected folder: {folder_path}")
         if not folder_path:
             return
 
@@ -137,9 +126,7 @@ class InterfaceDemo(customtkinter.CTk):
             for f in os.listdir(folder_path)
             if f.lower().endswith(valid_extensions)
         ]
-        # sort images by name without extension
-        self.image_paths.sort(key=lambda x: os.path.splitext(x)[0])
-        
+        self.image_paths.sort(key=lambda x: int(re.search(r'\d+', os.path.splitext(os.path.basename(x))[0]).group()))
         self.current_index = 0
         if self.image_paths:
             self.load_image(self.image_paths[self.current_index])
@@ -149,14 +136,14 @@ class InterfaceDemo(customtkinter.CTk):
             self.current_index += 1
             self.load_image(self.image_paths[self.current_index])
         else:
-            print("Fim das imagens.")
-    
+            print("End of images.")
+
     def previous_image(self):
         if self.current_index - 1 >= 0:
             self.current_index -= 1
             self.load_image(self.image_paths[self.current_index])
         else:
-            print("Início das imagens.")
+            print("Beginning of images.")
 
     def load_image(self, file_path):
         self.label_1.configure(text=os.path.basename(file_path))
@@ -184,16 +171,12 @@ class InterfaceDemo(customtkinter.CTk):
 
             self.image = image
         except Exception as e:
-            print(f"Erro ao carregar imagem {file_path}: {e}")
+            print(f"Error loading image {file_path}: {e}")
 
     def image_check(self, file_path):
-        validator = FaceQA(
-            image_path=file_path,
-            version=2
-        )
+        validator = FaceQA(image_path=file_path, version=2)
         result = validator.check_face()
 
-        # Limpa labels anteriores
         for attr in ["label_face", "label_eyes", "is_smiling", "contrast_is_good",
                      "brightness_is_good", "face_is_centralized", "more_than_one_face"]:
             if hasattr(self, attr):
@@ -210,31 +193,26 @@ class InterfaceDemo(customtkinter.CTk):
             setattr(self, attr_name, label)
             label.pack()
 
-        # Resultados
         if not result["face_detected"]:
-            create_label("label_face", "Face não detectada.", False)
+            create_label("label_face", "Face not detected.", False)
         else:
-            create_label("label_face", "Face detectada.", True)
-            create_label("more_than_one_face", "Mais de uma face" if result["more_than_one_face"] else "Apenas uma face", not result["more_than_one_face"])
-            create_label("label_eyes", "Olhos visíveis" if result["eyes_is_good"] else "Olhos não visíveis", result["eyes_is_good"])
-            create_label("is_smiling", "Sorriso detectado" if result["is_smiling"] else "Sem sorriso", not result["is_smiling"])
-            create_label("contrast_is_good", "Contraste bom" if result["contrast_is_good"] else "Contraste ruim", result["contrast_is_good"])
-            create_label("brightness_is_good", "Brilho bom" if result["brightness_is_good"] else "Brilho ruim", result["brightness_is_good"])
-            create_label("face_is_centralized", "Face centralizada" if result["face_is_centralized"] else "Face não centralizada", result["face_is_centralized"])
+            create_label("label_face", "Face detected.", True)
+            create_label("more_than_one_face", "More than one face" if result["more_than_one_face"] else "Only one face", not result["more_than_one_face"])
+            create_label("label_eyes", "Eyes visible" if result["eyes_is_good"] else "Eyes not visible", result["eyes_is_good"])
+            create_label("is_smiling", "Smiling" if result["is_smiling"] else "No smile", not result["is_smiling"])
+            create_label("contrast_is_good", "Good contrast" if result["contrast_is_good"] else "Poor contrast", result["contrast_is_good"])
+            create_label("brightness_is_good", "Good brightness" if result["brightness_is_good"] else "Poor brightness", result["brightness_is_good"])
+            create_label("face_is_centralized", "Face centered" if result["face_is_centralized"] else "Face not centered", result["face_is_centralized"])
 
-        # limpar anteriores
         for widget in self.frame_initial.winfo_children():
             if isinstance(widget, Label) and widget != self.image_label:
                 widget.destroy()
 
-        # Mostrar imagens auxiliares
         output_dir = os.path.join("output")
-        # print(f"Verificando imagens auxiliares em: {output_dir}")
         if os.path.exists(output_dir):
             for file in os.listdir(output_dir):
                 if file.endswith((".png", ".jpg")):
                     try:
-                        # print(f"Carregando imagem auxiliar: {file}")
                         img_path = os.path.join(output_dir, file)
                         img = Image.open(img_path)
                         img = img.resize((150, 150), Image.Resampling.LANCZOS)
@@ -243,12 +221,12 @@ class InterfaceDemo(customtkinter.CTk):
                         label.image = photo
                         label.pack(side=RIGHT, padx=5)
                     except Exception as e:
-                        print(f"Erro ao mostrar imagem {file}: {e}")
+                        print(f"Error displaying image {file}: {e}")
 
     def on_closing(self, event=0):
         self.destroy()
 
 
 if __name__ == "__main__":
-    app = InterfaceDemo()
+    app = FaceQAViewer()
     app.mainloop()
