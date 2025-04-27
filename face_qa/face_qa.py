@@ -99,6 +99,7 @@ class FaceQA():
         FaceDetectorOptions = mp.tasks.vision.FaceDetectorOptions
         VisionRunningMode = mp.tasks.vision.RunningMode
 
+        # Create a face detector instance with the image mode
         options = FaceDetectorOptions(
             base_options=BaseOptions(model_asset_path=model_path),
             running_mode=VisionRunningMode.IMAGE)
@@ -118,12 +119,17 @@ class FaceQA():
             return face_detection, more_than_one_face
 
     def _face_is_centralized(self, image, faces) -> bool:
+        '''
+        Using np to verify
+        '''
         x, y, w, h = faces[0]
+
+        # Check if the face image is centered
         face_center = (x + w // 2, y + h // 2)
         image_center = (image.shape[1] // 2, image.shape[0] // 2)
         distance = np.sqrt((face_center[0] - image_center[0]) ** 2 + (face_center[1] - image_center[1]) ** 2)
         
-        # Desenhar centro
+        # Draw center
         annotated = image.copy()
         cv2.circle(annotated, face_center, 5, (0, 255, 0), -1)
         cv2.circle(annotated, image_center, 5, (255, 0, 0), -1)
@@ -132,6 +138,9 @@ class FaceQA():
         return distance <= image.shape[0] * self.config["face_center_threshold"]
 
     def _brightness_is_good(self, gray) -> bool:
+        '''
+        Using cv2 to verify
+        '''
         annotated = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
         brightness = cv2.mean(gray)[0]
         cv2.putText(annotated, f"Brightness: {brightness:.2f}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0,0,255), 6)
@@ -146,27 +155,30 @@ class FaceQA():
         return contrast >= self.config["contrast_threshold"]
 
     def _eye_is_good(self, gray_image, face_image) -> bool:
+        '''
+        Using HaarCascade to Eyes Classification
+        '''
         model_path = os.path.dirname(__file__) + '/models/haarcascade_eye.xml'
         eye_cascade = cv2.CascadeClassifier(model_path)
 
-        # Corta apenas a parte superior do rosto
+        # Cut only the upper part of the face
         height = face_image.shape[0] + self.config["face_height_adcional"]
         upper_face_image = face_image[:height // 2, :]
         upper_gray_image = gray_image[:height // 2, :]
 
         self._save_image_result_folder_output(upper_gray_image, prefix="heigth_eyes_")
 
-        # Detecta olhos só na parte de cima
+        # Detects eyes only at the top
         eyes = eye_cascade.detectMultiScale(upper_face_image, minNeighbors=4)
         annotated = upper_face_image.copy()
 
-        # Pega os dois maiores olhos
+        # Take the two biggest
         eyes = sorted(eyes, key=lambda x: x[2] * x[3], reverse=True)[:2]
 
         good_eye = False
         for (ex, ey, ew, eh) in eyes:
-            # Corrige ey para coordenada da imagem original
-            absolute_ey = ey  # já é parte superior, então não precisa somar offset
+            # Corrects ey to original image coordinate
+            absolute_ey = ey  # It's already the top part, so there's no need to add offset
 
             eye_roi = upper_gray_image[absolute_ey:absolute_ey+eh, ex:ex+ew]
             thresh = cv2.threshold(eye_roi, 70, 255, cv2.THRESH_BINARY_INV)[1]
@@ -184,10 +196,9 @@ class FaceQA():
         return good_eye
 
     def _is_smiling(self, _, face_image) -> bool:
-        import mediapipe as mp
-        import numpy as np
-        import cv2
-
+        '''
+        Using Mediapipe to Face Classification
+        '''
         mp_face_mesh = mp.solutions.face_mesh
         annotated = face_image.copy()
         smile_ratio_threshold = self.config.get("smile_ratio_threshold", 1.8)
@@ -207,7 +218,8 @@ class FaceQA():
             def to_pixel(landmark):
                 return np.array([landmark.x * img_w, landmark.y * img_h])
 
-            # Posição dos pontos da boca
+            # Position of the mouth points
+
             left_pt = to_pixel(landmarks[61])
             right_pt = to_pixel(landmarks[291])
             top_pt = to_pixel(landmarks[13])
@@ -217,9 +229,7 @@ class FaceQA():
             mouth_height = np.linalg.norm(top_pt - bottom_pt)
             smile_ratio = mouth_width / (mouth_height + 1e-6)
 
-
-
-            # Validações extras
+            # Extra validations
             if mouth_width < min_mouth_width:
                 smiling = False
             elif smile_ratio < 1.1:
@@ -227,7 +237,7 @@ class FaceQA():
             else:
                 smiling = smile_ratio < smile_ratio_threshold
 
-            # Desenho e debug
+            # Draw
             cv2.putText(annotated, f"Smile Ratio: {smile_ratio:.2f}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 6)
             cv2.line(annotated, tuple(left_pt.astype(int)), tuple(right_pt.astype(int)), (0, 255, 255), 2)
             cv2.line(annotated, tuple(top_pt.astype(int)), tuple(bottom_pt.astype(int)), (255, 0, 255), 2)
