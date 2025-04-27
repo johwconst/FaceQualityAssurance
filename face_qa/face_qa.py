@@ -51,7 +51,6 @@ class FaceQA():
         face_cascade = cv2.CascadeClassifier(model_path)
         faces = face_cascade.detectMultiScale(gray, scaleFactor=self.config["scale_factor_face_cascade"], minNeighbors=self.config["min_neighbors_face_cascade"], minSize=self.config["min_size_face_cascade"])
 
-        # Usar as configurações carregadas do JSON
         self.result['eyes_is_good'] = self._eye_is_good(gray, image)
         self.result['is_smiling'] = self._is_smiling(face_cascade, image)
         self.result['contrast_is_good'] = self._contrast_is_good(gray)
