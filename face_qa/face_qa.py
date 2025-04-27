@@ -14,20 +14,20 @@ class FaceQA():
         self.image_path = image_path
         self.version = version
         self.result = {
-            "face_detected": bool,
-            "more_than_one_face": bool,
-            "eyes_is_good": bool,
-            "is_smiling": bool,
-            "contrast_is_good": bool,
-            "brightness_is_good": bool,
-            "face_is_centralized": bool
+          "face_detected": bool,
+          "more_than_one_face": bool,
+          "eyes_is_good": bool,
+          "is_smiling": bool,
+          "contrast_is_good": bool,
+          "brightness_is_good": bool,
+          "face_is_centralized": bool
         }
         
-        # Carregar configurações a partir do arquivo JSON
+        # Load settings from JSON file
         self.config = self._load_config(config_path)
     
     def _load_config(self, config_path: str):
-        """Carrega o arquivo JSON de configuração."""
+        """Load the configuration JSON file."""
         path_file = os.path.dirname(__file__) + config_path
         with open(path_file, 'r') as config_file:
             config = json.load(config_file)
