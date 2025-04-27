@@ -1,3 +1,4 @@
+from typing import Tuple
 import mediapipe as mp
 import cv2
 import numpy as np
@@ -59,13 +60,23 @@ class FaceQA():
 
         return self.result
 
-    def _face_detection_v1(self) -> (bool, bool):
+    def _face_detection_v1(self) -> Tuple[bool, bool]:
+        '''
+        Using HaarCascade to Face Classification
+        '''
         model_path = os.path.dirname(__file__) + '/models/haarcascade_frontalface_default.xml'
         image = cv2.imread(self.image_path)
+
+        # To gray scale
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+        # load model
         face_cascade = cv2.CascadeClassifier(model_path)
+
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5, minSize=(30, 30))
         faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
+        # Check more than one face
         if len(faces) == 1:         
             face_detection = True
             more_than_one_face = False
@@ -79,6 +90,9 @@ class FaceQA():
         return face_detection, more_than_one_face
     
     def _face_detection_v2(self) -> bool:
+        '''
+        Using MediaPipe to Face Classification
+        '''
         model_path = os.path.dirname(__file__) + '/models/blaze_face_short_range.tflite'
         BaseOptions = mp.tasks.BaseOptions
         FaceDetector = mp.tasks.vision.FaceDetector
