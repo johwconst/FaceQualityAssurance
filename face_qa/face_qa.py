@@ -5,6 +5,10 @@ import os
 import json
 
 class FaceQA():
+    '''
+    image_path: Image file path (.jpg images)
+    version: Face Classificator 1: haarcascade 2: mediapipe BlazeFace
+    '''
     def __init__(self, image_path: str, version: int, config_path: str = '/config.json'):
         self.image_path = image_path
         self.version = version
@@ -38,7 +42,7 @@ class FaceQA():
             if not self.result['face_detected']:
                 return self._return_all_false_result()
         
-        # Haarcascade para validação dos outros parâmetros
+        # Haarcascade is default to validade other params
         model_path = os.path.dirname(__file__) + '/models/haarcascade_frontalface_default.xml'
         image = cv2.imread(self.image_path)
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
