@@ -217,6 +217,15 @@ class FaceQA():
             self._save_image_result_folder_output(annotated, prefix="smile_")
             return smiling
 
+    def _return_all_false_result(self):
+        self.result['face_detected'] = False
+        self.result['more_than_one_face'] = False
+        self.result['eyes_is_good'] = False
+        self.result['is_smiling'] = False
+        self.result['contrast_is_good'] = False
+        self.result['brightness_is_good'] =  False
+        self.result['face_is_centralized'] = False
+        return self.result
     
     def _save_image_result_folder_output(self, image, folder_path = 'output', prefix = 'result_'):
         if not os.path.exists(folder_path):

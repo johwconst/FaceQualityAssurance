@@ -43,7 +43,7 @@ The aim of this project is to create a tool for validating the quality of these 
 ## Demo interface select folder
 
 <details>
-  <summary>Clique para expandir</summary>
+  <summary>Click to expand</summary>
 
 <p class="header" align="center">
   <img width="400px" src="https://i.imgur.com/rXqVNPr.png" align="center" alt="Image" />
@@ -53,6 +53,32 @@ The aim of this project is to create a tool for validating the quality of these 
 </p>
 
 </details>
+
+## Demo api
+
+  #### Passing a base64
+  ```bash
+  curl --request POST \
+    --url http://127.0.0.1:5000/base64 \
+    --header 'Content-Type: application/json' \
+    --header 'User-Agent: Insomnia/2023.5.7' \
+    --data '{
+    "image": "base64_encoded_image_string",
+  }
+  '
+  ```
+
+  #### Passing a url
+  ```bash
+  curl --request POST \
+    --url http://127.0.0.1:5000/url \
+    --header 'Content-Type: application/json' \
+    --header 'User-Agent: Insomnia/2023.5.7' \
+    --data '{
+    "url": "https://thispersondoesnotexist.com"
+  }
+  '
+  ```
 
 ## Verified Features
 - Verify if there is a face in the image ✔️
