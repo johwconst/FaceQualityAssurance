@@ -21,7 +21,6 @@ if __name__ == "__main__":
     # Create the folder if it doesn't exist
     folder_path = os.path.join(os.path.dirname(__file__), "photos")
     os.makedirs(folder_path, exist_ok=True)
-    # Download images in multi threading
     for i in range(10):
         download_image_from_site_this_person_does_not_exist()  
     
