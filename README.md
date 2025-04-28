@@ -40,6 +40,45 @@ The aim of this project is to create a tool for validating the quality of these 
  <img width="200px" src="https://i.imgur.com/MGwJRWX.png" align="center" alt="Image" />
 </p>
 
+## Demo interface select folder
+
+<details>
+  <summary>Click to expand</summary>
+
+<p class="header" align="center">
+  <img width="400px" src="https://i.imgur.com/rXqVNPr.png" align="center" alt="Image" />
+  <img width="400px" src="https://i.imgur.com/MqHaV5T.png" align="center" alt="Image" />
+  <img width="400px" src="https://i.imgur.com/g0xcscZ.png" align="center" alt="Image" />
+  <img width="400px" src="https://i.imgur.com/QFyZuTW.png" align="center" alt="Image" />
+</p>
+
+</details>
+
+## Demo api
+
+  #### Passing a base64
+  ```bash
+  curl --request POST \
+    --url http://127.0.0.1:5000/base64 \
+    --header 'Content-Type: application/json' \
+    --header 'User-Agent: Insomnia/2023.5.7' \
+    --data '{
+    "image": "base64_encoded_image_string",
+  }
+  '
+  ```
+
+  #### Passing a url
+  ```bash
+  curl --request POST \
+    --url http://127.0.0.1:5000/url \
+    --header 'Content-Type: application/json' \
+    --header 'User-Agent: Insomnia/2023.5.7' \
+    --data '{
+    "url": "https://thispersondoesnotexist.com"
+  }
+  '
+  ```
 
 ## Verified Features
 - Verify if there is a face in the image ✔️
@@ -55,7 +94,7 @@ The aim of this project is to create a tool for validating the quality of these 
 Check | Classificator |
 -- |-- |
 Face | HeerCascade or MediaPipe
-Smile | HeerCascade
+Smile | MediaPipe 
 Eyes | HeerCascade
 
 ## Interface Demo
