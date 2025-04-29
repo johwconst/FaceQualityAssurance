@@ -10,7 +10,7 @@ matplotlib==3.8.2
 mediapipe==0.10.9
 numpy==1.26.3
 opencv-contrib-python==4.9.0.80
-packaging==23.2
+packaging==24.0
 protobuf==3.20.3
 pycparser==2.21
 pyparsing==3.1.1
